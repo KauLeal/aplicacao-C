@@ -42,14 +42,40 @@ void tratador_menu_aluno(Aluno **alunos, int *qtd_atual_aluno)
         }
         else
         {
-            printf("Aluno não encontrado!!\n");
+            printf("Aluno não encontrado\n");
         }
     }
     break;
     case 3:
     {
-        printf("Implementar a atualização de aluno\n");
-    }
+        int posicao = 0;
+        aluno = buscar_aluno(alunos, &posicao);
+        if (aluno)
+        {
+            printf("\nDados atuais do aluno:\n");
+            imprimir_aluno(aluno);
+
+            printf("\nDigite os novos dados do aluno:\n");
+            printf("Matrícula\t> ");
+            fgets(aluno->matricula, 9, stdin);
+
+            printf("CPF\t> ");
+            fgets(aluno->cpf, 9, stdin);
+
+            printf("Nome\t> ");
+            fgets(aluno->nome, 49, stdin);
+
+            aluno->endereco = construir_endereco();
+
+            printf("\nDados do aluno atualizados:\n");
+            imprimir_aluno(aluno);
+        }
+        else
+        {
+            printf("\nAluno não encontrado\n");
+        }
+}
+break;
 
     break;
     case 4:
@@ -96,7 +122,7 @@ Endereco *construir_endereco()
 Aluno *construir_aluno()
 {
     Aluno aluno;
-    printf("Matrícula\t> ");
+    printf("\nMatrícula\t> ");
     fgets(aluno.matricula, 9, stdin);
     printf("CPF\t> ");
     fgets(aluno.cpf, 9, stdin);
@@ -109,7 +135,7 @@ Aluno *construir_aluno()
 Aluno *buscar_aluno(Aluno **alunos, int *posicao)
 {
     char matricula[50];
-    printf("Matrícula > ");
+    printf("\nMatrícula > ");
     fgets(matricula, 49, stdin);
     Aluno *resultado = NULL;
     int pos_resultado = -1;
@@ -129,7 +155,7 @@ Aluno *buscar_aluno(Aluno **alunos, int *posicao)
 
 void imprimir_aluno(Aluno *aluno)
 {
-    printf("Matrícula: %s", aluno->matricula);
+    printf("\nMatrícula: %s", aluno->matricula);
     printf("Nome: %s", aluno->nome);
     printf("CPF: %s", aluno->cpf);
     imprimir_endereco(aluno->endereco);
@@ -137,7 +163,7 @@ void imprimir_aluno(Aluno *aluno)
 
 void imprimir_endereco(Endereco *endereco)
 {
-    printf("Logradouro: %s", endereco->logradouro);
+    printf("\nLogradouro: %s", endereco->logradouro);
     printf("Número: %s", endereco->numero);
     printf("Bairro: %s", endereco->bairro);
     printf("Cidade: %s", endereco->cidade);

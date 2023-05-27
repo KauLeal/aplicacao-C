@@ -6,7 +6,7 @@ int menu_principal()
     int opcao = 0;
     do
     {
-        printf("== Menu principal==\n\n");
+        printf("\n== Menu principal==\n");
         printf("1 - Menu aluno\n");
         printf("2 - Sair\n");
         printf("Opcao > ");
@@ -26,7 +26,7 @@ int menu_crud_aluno()
     int opcao = 0;
     do
     {
-        printf("== Menu aluno==\n\n");
+        printf("\n== Menu aluno==\n");
         printf("1 - Criar aluno\n");
         printf("2 - Ler aluno\n");
         printf("3 - Atualizar aluno\n");

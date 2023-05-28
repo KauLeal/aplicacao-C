@@ -46,6 +46,32 @@ void salvarDadosAlunos(Aluno **alunos, int qtd_atual_aluno)
     fclose(arquivo);
 }
 
+void salvarDadosProfessores(Professor **professores, int qtd_atual_professor)
+{
+    FILE *arquivo = fopen("dados_professores.txt", "a");
+    if (arquivo == NULL)
+    {
+        perror("Erro ao abrir o arquivo para escrita");
+        return;
+    }
+
+    for (int i = 0; i < qtd_atual_professor; i++)
+    {
+        Professor *professor = professores[i];
+        fprintf(arquivo, "Matricula: %s", professor->matricula);
+        fprintf(arquivo, "CPF: %s", professor->cpf);
+        fprintf(arquivo, "Nome: %s", professor->nome);
+        fprintf(arquivo, "Logradouro: %s", professor->endereco->logradouro);
+        fprintf(arquivo, "Bairro: %s", professor->endereco->bairro);
+        fprintf(arquivo, "Cidade: %s", professor->endereco->cidade);
+        fprintf(arquivo, "Estado: %s", professor->endereco->estado);
+        fprintf(arquivo, "Numero: %s", professor->endereco->numero);
+        fprintf(arquivo, ";\n");
+    }
+
+    fclose(arquivo);
+}
+
 Endereco *criarEndereco(char *logradouro,
                         char *bairro,
                         char *cidade,
@@ -63,7 +89,7 @@ Endereco *criarEndereco(char *logradouro,
     }
     else
     {
-        perror("Não há memória disponível. Encerrando\n\n");
+        perror("Não ha memoria disponível. Encerrando\n\n");
     }
     return endereco;
 }
@@ -83,7 +109,7 @@ Professor *criarProfessor(char *matricula,
     }
     else
     {
-        perror("Não há memória disponível. Encerrando\n\n");
+        perror("Não ha memória disponível. Encerrando\n\n");
     }
     return professor;
 }

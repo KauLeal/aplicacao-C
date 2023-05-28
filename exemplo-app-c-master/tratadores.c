@@ -13,7 +13,7 @@ void tratador_menu_aluno(Aluno **alunos, int *qtd_atual_aluno)
     case 1:
         if (*qtd_atual_aluno >= MAX_ALUNO)
         {
-            printf("Número máximo de alunos atingido\n");
+            printf("Numero maximo de alunos atingido\n");
         }
         else
         {
@@ -67,39 +67,77 @@ void tratador_menu_aluno(Aluno **alunos, int *qtd_atual_aluno)
     fclose(arquivo);
     break;
 }
-    case 3:
+case 3:
+{
+    char cpf_pesquisa[9];
+    printf("Digite o CPF do aluno que deseja atualizar: ");
+    fgets(cpf_pesquisa, 9, stdin);
+    cpf_pesquisa[strcspn(cpf_pesquisa, "\n")] = '\0';  // Remover o caractere de nova linha
+
+    FILE *arquivo = fopen("dados_alunos.txt", "r+");
+    if (arquivo == NULL)
     {
-        int posicao = 0;
-        aluno = buscar_aluno(alunos, &posicao);
-        if (aluno)
+        perror("Erro ao abrir o arquivo para leitura/escrita");
+        break;
+    }
+
+    char linha[100];
+    long int posicao_aluno = -1;
+    while (fgets(linha, sizeof(linha), arquivo) != NULL)
+    {
+        if (strstr(linha, cpf_pesquisa) != NULL)
         {
-            printf("\nDados atuais do aluno:\n");
-            imprimir_aluno(aluno);
-
-            printf("\nDigite os novos dados do aluno:\n");
-            printf("Matrícula\t> ");
-            fgets(aluno->matricula, 9, stdin);
-
-            printf("CPF\t> ");
-            fgets(aluno->cpf, 9, stdin);
-
-            printf("Nome\t> ");
-            fgets(aluno->nome, 49, stdin);
-
-            aluno->endereco = construir_endereco();
-
-            printf("\nDados do aluno atualizados:\n");
-            imprimir_aluno(aluno);
-            salvarDadosAlunos(alunos, *qtd_atual_aluno);
+            // CPF encontrado, obter a posição no arquivo
+            posicao_aluno = ftell(arquivo) - strlen(linha);
+            break;
         }
-        else
-        {
-            printf("\nAluno não encontrado\n");
-        }
-}
-break;
+    }
 
+    if (posicao_aluno == -1)
+    {
+        printf("Aluno nao encontrado\n");
+        fclose(arquivo);
+        break;
+    }
+
+    // Posicionar o ponteiro do arquivo na posição do aluno
+    fseek(arquivo, posicao_aluno, SEEK_SET);
+
+    // Ler os dados atuais do aluno
+    Aluno aluno_atual;
+    fgets(aluno_atual.matricula, sizeof(aluno_atual.matricula), arquivo);
+    fgets(aluno_atual.cpf, sizeof(aluno_atual.cpf), arquivo);
+    fgets(aluno_atual.nome, sizeof(aluno_atual.nome), arquivo);
+
+    // Pular a linha em branco
+    fgets(linha, sizeof(linha), arquivo);
+
+    printf("\nDados atuais do aluno:\n");
+    imprimir_aluno(&aluno_atual);
+
+    printf("\nDigite os novos dados do aluno:\n");
+    Aluno *aluno_atualizado = construir_aluno();
+
+    // Posicionar o ponteiro do arquivo na posição do aluno
+    fseek(arquivo, posicao_aluno, SEEK_SET);
+
+    // Atualizar os dados do aluno no arquivo
+    fprintf(arquivo, "Matricula: %s", aluno_atualizado->matricula);
+    fprintf(arquivo, "CPF: %s", aluno_atualizado->cpf);
+    fprintf(arquivo, "Nome: %s", aluno_atualizado->nome);
+    fprintf(arquivo, "Endereço: ");
+    imprimir_endereco(aluno_atualizado->endereco);
+
+    // Escrever os dados do endereço do aluno, se necessário
+    fprintf(arquivo, "\n");
+
+    printf("\nDados do aluno atualizados:\n");
+    imprimir_aluno(aluno_atualizado);
+
+    fclose(arquivo);
     break;
+}
+
     case 4:
     {
         int posicao = 0;
@@ -112,7 +150,7 @@ break;
         }
         else
         {
-            printf("Aluno não encontrado!!\n");
+            printf("Aluno nao encontrado!!\n");
         }
     }
 
@@ -132,7 +170,7 @@ void tratador_menu_professor(Professor **professores, int *qtd_atual_professor)
     case 1:
         if (*qtd_atual_professor >= MAX_PROFESSOR)
         {
-            printf("Número máximo de professores atingido\n");
+            printf("Numero maximo de professores atingido\n");
         }
         else
         {
@@ -148,55 +186,115 @@ void tratador_menu_professor(Professor **professores, int *qtd_atual_professor)
             }
             Professor *professor = construir_professor();
             professores[i] = professor;
-            *qtd_atual_professor++;
+            (*qtd_atual_professor)++;
+            salvarDadosProfessores(professores, *qtd_atual_professor);
         }
         break;
     case 2:
+{
+    char cpf_pesquisa[9];
+    printf("\nDigite o CPF do professor: ");
+    fgets(cpf_pesquisa, 9, stdin);
+    printf("\n");
+    cpf_pesquisa[strcspn(cpf_pesquisa, "\n")] = '\0';  // Remover o caractere de nova linha
+
+    FILE *arquivo = fopen("dados_professores.txt", "r");
+    if (arquivo == NULL)
     {
-        int posicao = 0;
-        professor = buscar_professor(professores, &posicao);
-        if (professor)
+        perror("Erro ao abrir o arquivo para leitura");
+        break;
+    }
+
+    char linha[100];
+    while (fgets(linha, sizeof(linha), arquivo) != NULL)
+    {
+        if (strstr(linha, cpf_pesquisa) != NULL)
         {
-            imprimir_professor(professor);
-        }
-        else
-        {
-            printf("Professor não encontrado\n");
+            // CPF encontrado, imprimir o professor
+            Professor professor_encontrado;
+            strcpy(professor_encontrado.cpf, cpf_pesquisa);
+            fgets(professor_encontrado.nome, sizeof(professor_encontrado.nome), arquivo);
+
+            imprimir_professor(&professor_encontrado);
+
+            break;
         }
     }
+
+    fclose(arquivo);
     break;
-    case 3:
-    {
-        int posicao = 0;
-        professor = buscar_professor(professores, &posicao);
-        if (professor)
-        {
-            printf("\nDados atuais do professor:\n");
-            imprimir_professor(professor);
-
-            printf("\nDigite os novos dados do professor:\n");
-            printf("Matrícula\t> ");
-            fgets(professor->matricula, 9, stdin);
-
-            printf("CPF\t> ");
-            fgets(professor->cpf, 9, stdin);
-
-            printf("Nome\t> ");
-            fgets(professor->nome, 49, stdin);
-
-            professor->endereco = construir_endereco();
-
-            printf("\nDados do professor atualizados:\n");
-            imprimir_professor(professor);
-        }
-        else
-        {
-            printf("\nProfessor não encontrado\n");
-        }
 }
-break;
+case 3:
+{
+    char cpf_pesquisa[9];
+    printf("Digite o CPF do professor que deseja atualizar: ");
+    fgets(cpf_pesquisa, 9, stdin);
+    cpf_pesquisa[strcspn(cpf_pesquisa, "\n")] = '\0';  // Remover o caractere de nova linha
 
+    FILE *arquivo = fopen("dados_professores.txt", "r+");
+    if (arquivo == NULL)
+    {
+        perror("Erro ao abrir o arquivo para leitura/escrita");
+        break;
+    }
+
+    char linha[100];
+    long int posicao_professor = -1;
+    while (fgets(linha, sizeof(linha), arquivo) != NULL)
+    {
+        if (strstr(linha, cpf_pesquisa) != NULL)
+        {
+            // CPF encontrado, obter a posição no arquivo
+            posicao_professor = ftell(arquivo) - strlen(linha);
+            break;
+        }
+    }
+
+    if (posicao_professor == -1)
+    {
+        printf("Professor nao encontrado\n");
+        fclose(arquivo);
+        break;
+    }
+
+    // Posicionar o ponteiro do arquivo na posição do professor
+    fseek(arquivo, posicao_professor, SEEK_SET);
+
+    // Ler os dados atuais do professor
+    Professor professor_atual;
+    fgets(professor_atual.matricula, sizeof(professor_atual.matricula), arquivo);
+    fgets(professor_atual.cpf, sizeof(professor_atual.cpf), arquivo);
+    fgets(professor_atual.nome, sizeof(professor_atual.nome), arquivo);
+
+    // Pular a linha em branco
+    fgets(linha, sizeof(linha), arquivo);
+
+    printf("\nDados atuais do professor:\n");
+    imprimir_professor(&professor_atual);
+
+    printf("\nDigite os novos dados do professor:\n");
+    Professor *professor_atualizado = construir_professor();
+
+    // Posicionar o ponteiro do arquivo na posição do professor
+    fseek(arquivo, posicao_professor, SEEK_SET);
+
+    // Atualizar os dados do professor no arquivo
+    fprintf(arquivo, "Matricula: %s", professor_atualizado->matricula);
+    fprintf(arquivo, "CPF: %s", professor_atualizado->cpf);
+    fprintf(arquivo, "Nome: %s", professor_atualizado->nome);
+    fprintf(arquivo, "Endereço: ");
+    imprimir_endereco(professor_atualizado->endereco);
+
+    // Escrever os dados do endereço do professor, se necessário
+    fprintf(arquivo, "\n");
+
+    printf("\nDados do professor atualizados:\n");
+    imprimir_professor(professor_atualizado);
+
+    fclose(arquivo);
     break;
+}
+
     case 4:
     {
         int posicao = 0;
@@ -209,7 +307,7 @@ break;
         }
         else
         {
-            printf("Professor não encontrado!!\n");
+            printf("Professor nao encontrado!!\n");
         }
     }
 
@@ -232,7 +330,7 @@ Endereco *construir_endereco()
     fgets(endereco.cidade, 49, stdin);
     printf("Estado\t> ");
     fgets(endereco.estado, 9, stdin);
-    printf("Número\t> ");
+    printf("Numero\t> ");
     fgets(endereco.numero, 9, stdin);
 
     return criarEndereco(endereco.logradouro, endereco.bairro, endereco.cidade, endereco.estado, endereco.numero);
@@ -240,17 +338,17 @@ Endereco *construir_endereco()
 
 void imprimir_endereco(Endereco *endereco)
 {
-    printf("\nLogradouro: %s", endereco->logradouro);
-    printf("Número: %s", endereco->numero);
+    printf("Logradouro: %s", endereco->logradouro);
     printf("Bairro: %s", endereco->bairro);
     printf("Cidade: %s", endereco->cidade);
     printf("Estado: %s", endereco->estado);
+    printf("Numero: %s", endereco->numero);
 }
 
 Aluno *construir_aluno()
 {
     Aluno aluno;
-    printf("\nMatrícula\t> ");
+    printf("\nMatricula\t> ");
     fgets(aluno.matricula, 9, stdin);
     printf("CPF\t> ");
     fgets(aluno.cpf, 9, stdin);
@@ -263,7 +361,7 @@ Aluno *construir_aluno()
 Aluno *buscar_aluno(Aluno **alunos, int *posicao)
 {
     char matricula[50];
-    printf("\nMatrícula > ");
+    printf("\nMatricula > ");
     fgets(matricula, 49, stdin);
     Aluno *resultado = NULL;
     int pos_resultado = -1;
@@ -311,7 +409,7 @@ void imprimir_aluno(Aluno *aluno)
 Professor *construir_professor()
 {
     Professor professor;
-    printf("\nMatrícula\t> ");
+    printf("\nMatricula\t> ");
     fgets(professor.matricula, 9, stdin);
     printf("CPF\t> ");
     fgets(professor.cpf, 9, stdin);
@@ -324,7 +422,7 @@ Professor *construir_professor()
 Professor *buscar_professor(Professor **professores, int *posicao)
 {
     char matricula[50];
-    printf("\nMatrícula > ");
+    printf("\nMatricula > ");
     fgets(matricula, 49, stdin);
     Professor *resultado = NULL;
     int pos_resultado = -1;
@@ -344,7 +442,7 @@ Professor *buscar_professor(Professor **professores, int *posicao)
 
 void imprimir_professor(Professor *professor)
 {
-    printf("\nMatrícula: %s", professor->matricula);
+    printf("\nMatricula: %s", professor->matricula);
     printf("Nome: %s", professor->nome);
     printf("CPF: %s", professor->cpf);
     imprimir_endereco(professor->endereco);

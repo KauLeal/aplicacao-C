@@ -17,7 +17,7 @@ int menu_principal()
         {
             return opcao;
         }
-        printf("Opcao inválida!! Tente novamente\n\n");
+        printf("Opcao invalida! Tente novamente\n\n");
 
     } while (1);
 }
@@ -40,7 +40,7 @@ int menu_crud_aluno()
         {
             return opcao;
         }
-        printf("Opcao inválida!! Tente novamente\n\n");
+        printf("Opcao invalida! Tente novamente\n\n");
 
     } while (1);
 }
@@ -63,7 +63,7 @@ int menu_crud_professor()
         {
             return opcao;
         }
-        printf("Opcao inválida!! Tente novamente\n\n");
+        printf("Opcao invalida! Tente novamente\n\n");
 
     } while (1);
 }

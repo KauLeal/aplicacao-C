@@ -1,6 +1,7 @@
 #ifndef _DADOS_H_
 #define _DADOS_H_
 
+
 typedef struct
 {
     char logradouro[50];

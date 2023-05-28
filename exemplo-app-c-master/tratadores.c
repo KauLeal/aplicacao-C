@@ -29,23 +29,44 @@ void tratador_menu_aluno(Aluno **alunos, int *qtd_atual_aluno)
             }
             Aluno *aluno = construir_aluno();
             alunos[i] = aluno;
-            *qtd_atual_aluno++;
+            (*qtd_atual_aluno)++;
+            salvarDadosAlunos(alunos, *qtd_atual_aluno);
         }
         break;
     case 2:
+{
+    char cpf_pesquisa[9];
+    printf("\nDigite o CPF do aluno: ");
+    fgets(cpf_pesquisa, 9, stdin);
+    printf("\n");
+    cpf_pesquisa[strcspn(cpf_pesquisa, "\n")] = '\0';  // Remover o caractere de nova linha
+
+    FILE *arquivo = fopen("dados_alunos.txt", "r");
+    if (arquivo == NULL)
     {
-        int posicao = 0;
-        aluno = buscar_aluno(alunos, &posicao);
-        if (aluno)
+        perror("Erro ao abrir o arquivo para leitura");
+        break;
+    }
+
+    char linha[100];
+    while (fgets(linha, sizeof(linha), arquivo) != NULL)
+    {
+        if (strstr(linha, cpf_pesquisa) != NULL)
         {
-            imprimir_aluno(aluno);
-        }
-        else
-        {
-            printf("Aluno não encontrado\n");
+            // CPF encontrado, imprimir o aluno
+            Aluno aluno_encontrado;
+            strcpy(aluno_encontrado.cpf, cpf_pesquisa);
+            fgets(aluno_encontrado.nome, sizeof(aluno_encontrado.nome), arquivo);
+
+            imprimir_aluno(&aluno_encontrado);
+
+            break;
         }
     }
+
+    fclose(arquivo);
     break;
+}
     case 3:
     {
         int posicao = 0;
@@ -69,6 +90,7 @@ void tratador_menu_aluno(Aluno **alunos, int *qtd_atual_aluno)
 
             printf("\nDados do aluno atualizados:\n");
             imprimir_aluno(aluno);
+            salvarDadosAlunos(alunos, *qtd_atual_aluno);
         }
         else
         {
@@ -261,10 +283,29 @@ Aluno *buscar_aluno(Aluno **alunos, int *posicao)
 
 void imprimir_aluno(Aluno *aluno)
 {
-    printf("\nMatrícula: %s", aluno->matricula);
-    printf("Nome: %s", aluno->nome);
-    printf("CPF: %s", aluno->cpf);
-    imprimir_endereco(aluno->endereco);
+    FILE *arquivo = fopen("dados_alunos.txt", "r");
+    if (arquivo == NULL)
+    {
+        perror("Erro ao abrir o arquivo para leitura");
+        return;
+    }
+
+    char linha[100];
+    while (fgets(linha, sizeof(linha), arquivo) != NULL)
+    {
+        if (strstr(linha, aluno->cpf) != NULL)
+        {
+            while (fgets(linha, sizeof(linha), arquivo) != NULL)
+            {
+                if (strstr(linha, ";") != NULL)
+                    break;
+                printf("%s", linha);
+            }
+            break;
+        }
+    }
+
+    fclose(arquivo);
 }
 
 Professor *construir_professor()

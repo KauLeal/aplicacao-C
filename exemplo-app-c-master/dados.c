@@ -3,15 +3,12 @@
 #include <string.h>
 #include <stdio.h>
 
-Aluno *criarAluno(char *matricula,
-                  char *cpf,
-                  char *nome,
-                  Endereco *end)
+Aluno *criarAluno(char *matricula, char *cpf, char *nome, Endereco *end)
 {
     Aluno *aluno = (Aluno *)malloc(sizeof(Aluno));
     if (aluno)
     {
-        strcpy(aluno->matricula, matricula); // Copia matricula para aluno->matricula
+        strcpy(aluno->matricula, matricula);
         strcpy(aluno->cpf, cpf);
         strcpy(aluno->nome, nome);
         aluno->endereco = end;
@@ -21,6 +18,32 @@ Aluno *criarAluno(char *matricula,
         perror("Não há memória disponível. Encerrando\n\n");
     }
     return aluno;
+}
+
+void salvarDadosAlunos(Aluno **alunos, int qtd_atual_aluno)
+{
+    FILE *arquivo = fopen("dados_alunos.txt", "a");
+    if (arquivo == NULL)
+    {
+        perror("Erro ao abrir o arquivo para escrita");
+        return;
+    }
+
+    for (int i = 0; i < qtd_atual_aluno; i++)
+    {
+        Aluno *aluno = alunos[i];
+        fprintf(arquivo, "Matricula: %s", aluno->matricula);
+        fprintf(arquivo, "CPF: %s", aluno->cpf);
+        fprintf(arquivo, "Nome: %s", aluno->nome);
+        fprintf(arquivo, "Logradouro: %s", aluno->endereco->logradouro);
+        fprintf(arquivo, "Bairro: %s", aluno->endereco->bairro);
+        fprintf(arquivo, "Cidade: %s", aluno->endereco->cidade);
+        fprintf(arquivo, "Estado: %s", aluno->endereco->estado);
+        fprintf(arquivo, "Numero: %s", aluno->endereco->numero);
+        fprintf(arquivo, ";\n");
+    }
+
+    fclose(arquivo);
 }
 
 Endereco *criarEndereco(char *logradouro,

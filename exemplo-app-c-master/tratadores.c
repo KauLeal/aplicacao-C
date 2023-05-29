@@ -466,3 +466,222 @@ void imprimir_professor(Professor *professor)
 
     fclose(arquivo_professor);
 }
+
+void tratador_menu_turma(Turma **turmas, int *qtd_atual_turma)
+{
+    int opcao = menu_crud_turma();
+    Turma *turma = NULL;
+    switch (opcao)
+    {
+    case 1:
+        if (*qtd_atual_turma >= MAX_TURMA)
+        {
+            printf("Numero maximo de turmas atingido\n");
+        }
+        else
+        {
+            // Passo 1: buscar posicao disponível
+            int i = 0;
+            for (; i < *qtd_atual_turma; i++)
+            {
+                if (turmas[i] != NULL)
+                {
+                    // significa que esta posição está livre para uso
+                    break;
+                }
+            }
+            Turma *turma = construir_turma();
+            turmas[i] = turma;
+            (*qtd_atual_turma)++;
+            salvarDadosTurmas(turmas, *qtd_atual_turma);
+        }
+        break;
+    case 2:
+{
+    char cod_pesquisa[9];
+    printf("\nDigite o codigo do turma: ");
+    fgets(cod_pesquisa, 9, stdin);
+    printf("\n");
+    cod_pesquisa[strcspn(cod_pesquisa, "\n")] = '\0';  // Remover o caractere de nova linha
+
+    FILE *arquivo_turma = fopen("dados_turmas.txt", "r");
+    if (arquivo_turma == NULL)
+    {
+        perror("Erro ao abrir o arquivo para leitura");
+        break;
+    }
+
+    char linha[100];
+    while (fgets(linha, sizeof(linha), arquivo_turma) != NULL)
+    {
+        if (strstr(linha, cod_pesquisa) != NULL)
+        {
+            // Codigo encontrado, imprimir a turma
+            Turma turma_encontrado;
+            strcpy(turma_encontrado.codigo, cod_pesquisa);
+            fgets(turma_encontrado.nome_disc, sizeof(turma_encontrado.nome_disc), arquivo_turma);
+
+            imprimir_turma(&turma_encontrado);
+
+            break;
+        }
+    }
+
+    fclose(arquivo_turma);
+    break;
+}
+case 3:
+{
+    char cod_pesquisa[9];
+    printf("Digite o codigo da turma que deseja atualizar: ");
+    fgets(cod_pesquisa, 9, stdin);
+    cod_pesquisa[strcspn(cod_pesquisa, "\n")] = '\0';  // Remover o caractere de nova linha
+
+    FILE *arquivo_turma = fopen("dados_turmas.txt", "r+");
+    if (arquivo_turma == NULL)
+    {
+        perror("Erro ao abrir o arquivo para leitura/escrita");
+        break;
+    }
+
+    char linha[100];
+    long int posicao_turma = -1;
+    while (fgets(linha, sizeof(linha), arquivo_turma) != NULL)
+    {
+        if (strstr(linha, cod_pesquisa) != NULL)
+        {
+            // Codigo encontrado, obter a posição no arquivo
+            posicao_turma = ftell(arquivo_turma) - strlen(linha);
+            break;
+        }
+    }
+
+    if (posicao_turma == -1)
+    {
+        printf("Turma nao encontrada\n");
+        fclose(arquivo_turma);
+        break;
+    }
+
+    // Posicionar o ponteiro do arquivo na posição da turma
+    fseek(arquivo_turma, posicao_turma, SEEK_SET);
+
+    // Ler os dados atuais da turma
+    Turma turma_atual;
+    fgets(turma_atual.codigo, sizeof(turma_atual.codigo), arquivo_turma);
+    fgets(turma_atual.nome_disc, sizeof(turma_atual.nome_disc), arquivo_turma);
+    fgets(turma_atual.prof, sizeof(turma_atual.prof), arquivo_turma);
+    fgets(turma_atual.media, sizeof(turma_atual.media), arquivo_turma);
+
+    // Pular a linha em branco
+    fgets(linha, sizeof(linha), arquivo_turma);
+
+    printf("\nDados atuais da turma:\n");
+    imprimir_turma(&turma_atual);
+
+    printf("\nDigite os novos dados da turma:\n");
+    Turma *turma_atualizado = construir_turma();
+
+    // Posicionar o ponteiro do arquivo na posição da turma
+    fseek(arquivo_turma, posicao_turma, SEEK_SET);
+
+    // Atualizar os dados da turma no arquivo
+    fprintf(arquivo_turma, "Codigo da turma: %s", turma_atualizado->codigo);
+    fprintf(arquivo_turma, "Nome da disciplina: %s", turma_atualizado->nome_disc);
+    fprintf(arquivo_turma, "Professor da turma: %s", turma_atualizado->prof);
+    fprintf(arquivo_turma, "Nota media da turma: %s", turma_atualizado->media);
+
+    // Escrever os dados do endereço da turma, se necessário
+    fprintf(arquivo_turma, "\n");
+
+    printf("\nDados da turma atualizados:\n");
+    imprimir_turma(turma_atualizado);
+
+    fclose(arquivo_turma);
+    break;
+}
+
+    case 4:
+    {
+        int posicao = 0;
+        turma = buscar_turma(turmas, &posicao);
+        if (turma)
+        {
+            destruirTurma(turma);
+            turmas[posicao] = NULL;
+            printf("Turma destruida\n");
+        }
+        else
+        {
+            printf("Turma nao encontrada\n");
+        }
+    }
+
+    break;
+    default:
+        printf("Retornando ao menu principal\n");
+        break;
+    }
+}
+
+Turma *construir_turma()
+{
+    Turma turma;
+    printf("\nCodigo da turma\t> ");
+    fgets(turma.codigo, 9, stdin);
+    printf("Nome da disciplina\t> ");
+    fgets(turma.nome_disc, 30, stdin);
+    printf("Professor da turma\t> ");
+    fgets(turma.prof, 30, stdin);
+    printf("Media da turma\t> ");
+    fgets(turma.media, 10, stdin);    
+    return criarTurma(turma.codigo, turma.nome_disc, turma.prof, turma.media);
+}
+
+Turma *buscar_turma(Turma **turmas, int *posicao)
+{
+    char codigo[50];
+    printf("\nCodigo da turma > ");
+    fgets(codigo, 49, stdin);
+    Turma *resultado = NULL;
+    int pos_resultado = -1;
+    for (int i = 0; i < MAX_TURMA; i++)
+    {
+        // Vamos testar se a turma existe e se o codigo e a buscada
+        // strcmp compara strings. Se for 0 indica que são iguais
+        if (turmas[i] && !strcmp(codigo, turmas[i]->codigo))
+        {
+            resultado = turmas[i];
+            break;
+        }
+    }
+    *posicao = pos_resultado;
+    return resultado;
+}
+
+void imprimir_turma(Turma *turma)
+{
+    FILE *arquivo_turma = fopen("dados_turmas.txt", "r");
+    if (arquivo_turma == NULL)
+    {
+        perror("Erro ao abrir o arquivo para leitura");
+        return;
+    }
+
+    char linha[100];
+    while (fgets(linha, sizeof(linha), arquivo_turma) != NULL)
+    {
+        if (strstr(linha, turma->codigo) != NULL)
+        {
+            while (fgets(linha, sizeof(linha), arquivo_turma) != NULL)
+            {
+                if (strstr(linha, ";") != NULL)
+                    break;
+                printf("%s", linha);
+            }
+            break;
+        }
+    }
+
+    fclose(arquivo_turma);
+}

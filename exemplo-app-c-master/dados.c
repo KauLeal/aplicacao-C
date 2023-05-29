@@ -139,3 +139,50 @@ void destruirEndereco(Endereco *endereco)
     if (endereco)
         free(endereco);
 }
+
+void destruirTurma(Turma *turma)
+{
+    if (turma)
+    {
+        free(turma);
+    }
+}
+
+Turma *criarTurma(char *codigo, char *nome_disc, char *prof, char *media)
+{
+    Turma *turma = (Turma *)malloc(sizeof(Turma));
+    if (turma)
+    {
+        strcpy(turma->codigo, codigo);
+        strcpy(turma->nome_disc, nome_disc);
+        strcpy(turma->prof, prof);
+        strcpy(turma->media, media);
+    }
+    else
+    {
+        perror("Não há memória disponível. Encerrando\n\n");
+    }
+    return turma;
+}
+
+void salvarDadosTurmas(Turma **turmas, int qtd_atual_turma)
+{
+    FILE *arquivo_turma = fopen("dados_turmas.txt", "a");
+    if (arquivo_turma == NULL)
+    {
+        perror("Erro ao abrir o arquivo para escrita");
+        return;
+    }
+
+    for (int i = 0; i < qtd_atual_turma; i++)
+    {
+        Turma *turma = turmas[i];
+        fprintf(arquivo_turma, "Codigo da turma: %s", turma->codigo);
+        fprintf(arquivo_turma, "Nome da disciplina: %s", turma->nome_disc);
+        fprintf(arquivo_turma, "Professor da turma: %s", turma->prof);
+        fprintf(arquivo_turma, "Nota media da turma: %s", turma->media);
+        fprintf(arquivo_turma, ";\n");
+    }
+
+    fclose(arquivo_turma);
+}

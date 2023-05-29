@@ -9,11 +9,12 @@ int menu_principal()
         printf("\n== Menu principal ==\n");
         printf("1 - Menu aluno\n");
         printf("2 - Menu professor\n");
-        printf("3 - Sair\n");
+        printf("3 - Menu turma\n");
+        printf("4 - Sair\n");
         printf("Opcao > ");
         scanf("%d", &opcao);
         getchar();
-        if (opcao > 0 && opcao < 4)
+        if (opcao > 0 && opcao < 5)
         {
             return opcao;
         }
@@ -55,6 +56,29 @@ int menu_crud_professor()
         printf("2 - Ler professor\n");
         printf("3 - Atualizar professor\n");
         printf("4 - Deletar professor\n");
+        printf("5 - Voltar menu anterior\n");
+        printf("Opcao > ");
+        scanf("%d", &opcao);
+        getchar();
+        if (opcao > 0 && opcao < 6)
+        {
+            return opcao;
+        }
+        printf("Opcao invalida! Tente novamente\n\n");
+
+    } while (1);
+}
+
+int menu_crud_turma()
+{
+    int opcao = 0;
+    do
+    {
+        printf("\n== Menu turma==\n");
+        printf("1 - Criar turma\n");
+        printf("2 - Ler turma\n");
+        printf("3 - Atualizar turma\n");
+        printf("4 - Deletar turma\n");
         printf("5 - Voltar menu anterior\n");
         printf("Opcao > ");
         scanf("%d", &opcao);

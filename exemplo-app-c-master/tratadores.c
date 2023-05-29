@@ -41,22 +41,22 @@ void tratador_menu_aluno(Aluno **alunos, int *qtd_atual_aluno)
     printf("\n");
     cpf_pesquisa[strcspn(cpf_pesquisa, "\n")] = '\0';  // Remover o caractere de nova linha
 
-    FILE *arquivo = fopen("dados_alunos.txt", "r");
-    if (arquivo == NULL)
+    FILE *arquivo_aluno = fopen("dados_alunos.txt", "r");
+    if (arquivo_aluno == NULL)
     {
         perror("Erro ao abrir o arquivo para leitura");
         break;
     }
 
     char linha[100];
-    while (fgets(linha, sizeof(linha), arquivo) != NULL)
+    while (fgets(linha, sizeof(linha), arquivo_aluno) != NULL)
     {
         if (strstr(linha, cpf_pesquisa) != NULL)
         {
             // CPF encontrado, imprimir o aluno
             Aluno aluno_encontrado;
             strcpy(aluno_encontrado.cpf, cpf_pesquisa);
-            fgets(aluno_encontrado.nome, sizeof(aluno_encontrado.nome), arquivo);
+            fgets(aluno_encontrado.nome, sizeof(aluno_encontrado.nome), arquivo_aluno);
 
             imprimir_aluno(&aluno_encontrado);
 
@@ -64,7 +64,7 @@ void tratador_menu_aluno(Aluno **alunos, int *qtd_atual_aluno)
         }
     }
 
-    fclose(arquivo);
+    fclose(arquivo_aluno);
     break;
 }
 case 3:
@@ -74,8 +74,8 @@ case 3:
     fgets(cpf_pesquisa, 9, stdin);
     cpf_pesquisa[strcspn(cpf_pesquisa, "\n")] = '\0';  // Remover o caractere de nova linha
 
-    FILE *arquivo = fopen("dados_alunos.txt", "r+");
-    if (arquivo == NULL)
+    FILE *arquivo_aluno = fopen("dados_alunos.txt", "r+");
+    if (arquivo_aluno == NULL)
     {
         perror("Erro ao abrir o arquivo para leitura/escrita");
         break;
@@ -83,12 +83,12 @@ case 3:
 
     char linha[100];
     long int posicao_aluno = -1;
-    while (fgets(linha, sizeof(linha), arquivo) != NULL)
+    while (fgets(linha, sizeof(linha), arquivo_aluno) != NULL)
     {
         if (strstr(linha, cpf_pesquisa) != NULL)
         {
             // CPF encontrado, obter a posição no arquivo
-            posicao_aluno = ftell(arquivo) - strlen(linha);
+            posicao_aluno = ftell(arquivo_aluno) - strlen(linha);
             break;
         }
     }
@@ -96,21 +96,21 @@ case 3:
     if (posicao_aluno == -1)
     {
         printf("Aluno nao encontrado\n");
-        fclose(arquivo);
+        fclose(arquivo_aluno);
         break;
     }
 
     // Posicionar o ponteiro do arquivo na posição do aluno
-    fseek(arquivo, posicao_aluno, SEEK_SET);
+    fseek(arquivo_aluno, posicao_aluno, SEEK_SET);
 
     // Ler os dados atuais do aluno
     Aluno aluno_atual;
-    fgets(aluno_atual.matricula, sizeof(aluno_atual.matricula), arquivo);
-    fgets(aluno_atual.cpf, sizeof(aluno_atual.cpf), arquivo);
-    fgets(aluno_atual.nome, sizeof(aluno_atual.nome), arquivo);
+    fgets(aluno_atual.matricula, sizeof(aluno_atual.matricula), arquivo_aluno);
+    fgets(aluno_atual.cpf, sizeof(aluno_atual.cpf), arquivo_aluno);
+    fgets(aluno_atual.nome, sizeof(aluno_atual.nome), arquivo_aluno);
 
     // Pular a linha em branco
-    fgets(linha, sizeof(linha), arquivo);
+    fgets(linha, sizeof(linha), arquivo_aluno);
 
     printf("\nDados atuais do aluno:\n");
     imprimir_aluno(&aluno_atual);
@@ -119,22 +119,22 @@ case 3:
     Aluno *aluno_atualizado = construir_aluno();
 
     // Posicionar o ponteiro do arquivo na posição do aluno
-    fseek(arquivo, posicao_aluno, SEEK_SET);
+    fseek(arquivo_aluno, posicao_aluno, SEEK_SET);
 
     // Atualizar os dados do aluno no arquivo
-    fprintf(arquivo, "Matricula: %s", aluno_atualizado->matricula);
-    fprintf(arquivo, "CPF: %s", aluno_atualizado->cpf);
-    fprintf(arquivo, "Nome: %s", aluno_atualizado->nome);
-    fprintf(arquivo, "Endereço: ");
+    fprintf(arquivo_aluno, "Matricula: %s", aluno_atualizado->matricula);
+    fprintf(arquivo_aluno, "CPF: %s", aluno_atualizado->cpf);
+    fprintf(arquivo_aluno, "Nome: %s", aluno_atualizado->nome);
+    fprintf(arquivo_aluno, "Endereço: ");
     imprimir_endereco(aluno_atualizado->endereco);
 
     // Escrever os dados do endereço do aluno, se necessário
-    fprintf(arquivo, "\n");
+    fprintf(arquivo_aluno, "\n");
 
     printf("\nDados do aluno atualizados:\n");
     imprimir_aluno(aluno_atualizado);
 
-    fclose(arquivo);
+    fclose(arquivo_aluno);
     break;
 }
 
@@ -198,22 +198,22 @@ void tratador_menu_professor(Professor **professores, int *qtd_atual_professor)
     printf("\n");
     cpf_pesquisa[strcspn(cpf_pesquisa, "\n")] = '\0';  // Remover o caractere de nova linha
 
-    FILE *arquivo = fopen("dados_professores.txt", "r");
-    if (arquivo == NULL)
+    FILE *arquivo_professor = fopen("dados_professores.txt", "r");
+    if (arquivo_professor == NULL)
     {
         perror("Erro ao abrir o arquivo para leitura");
         break;
     }
 
     char linha[100];
-    while (fgets(linha, sizeof(linha), arquivo) != NULL)
+    while (fgets(linha, sizeof(linha), arquivo_professor) != NULL)
     {
         if (strstr(linha, cpf_pesquisa) != NULL)
         {
             // CPF encontrado, imprimir o professor
             Professor professor_encontrado;
             strcpy(professor_encontrado.cpf, cpf_pesquisa);
-            fgets(professor_encontrado.nome, sizeof(professor_encontrado.nome), arquivo);
+            fgets(professor_encontrado.nome, sizeof(professor_encontrado.nome), arquivo_professor);
 
             imprimir_professor(&professor_encontrado);
 
@@ -221,7 +221,7 @@ void tratador_menu_professor(Professor **professores, int *qtd_atual_professor)
         }
     }
 
-    fclose(arquivo);
+    fclose(arquivo_professor);
     break;
 }
 case 3:
@@ -231,8 +231,8 @@ case 3:
     fgets(cpf_pesquisa, 9, stdin);
     cpf_pesquisa[strcspn(cpf_pesquisa, "\n")] = '\0';  // Remover o caractere de nova linha
 
-    FILE *arquivo = fopen("dados_professores.txt", "r+");
-    if (arquivo == NULL)
+    FILE *arquivo_professor = fopen("dados_professores.txt", "r+");
+    if (arquivo_professor == NULL)
     {
         perror("Erro ao abrir o arquivo para leitura/escrita");
         break;
@@ -240,12 +240,12 @@ case 3:
 
     char linha[100];
     long int posicao_professor = -1;
-    while (fgets(linha, sizeof(linha), arquivo) != NULL)
+    while (fgets(linha, sizeof(linha), arquivo_professor) != NULL)
     {
         if (strstr(linha, cpf_pesquisa) != NULL)
         {
             // CPF encontrado, obter a posição no arquivo
-            posicao_professor = ftell(arquivo) - strlen(linha);
+            posicao_professor = ftell(arquivo_professor) - strlen(linha);
             break;
         }
     }
@@ -253,21 +253,21 @@ case 3:
     if (posicao_professor == -1)
     {
         printf("Professor nao encontrado\n");
-        fclose(arquivo);
+        fclose(arquivo_professor);
         break;
     }
 
     // Posicionar o ponteiro do arquivo na posição do professor
-    fseek(arquivo, posicao_professor, SEEK_SET);
+    fseek(arquivo_professor, posicao_professor, SEEK_SET);
 
     // Ler os dados atuais do professor
     Professor professor_atual;
-    fgets(professor_atual.matricula, sizeof(professor_atual.matricula), arquivo);
-    fgets(professor_atual.cpf, sizeof(professor_atual.cpf), arquivo);
-    fgets(professor_atual.nome, sizeof(professor_atual.nome), arquivo);
+    fgets(professor_atual.matricula, sizeof(professor_atual.matricula), arquivo_professor);
+    fgets(professor_atual.cpf, sizeof(professor_atual.cpf), arquivo_professor);
+    fgets(professor_atual.nome, sizeof(professor_atual.nome), arquivo_professor);
 
     // Pular a linha em branco
-    fgets(linha, sizeof(linha), arquivo);
+    fgets(linha, sizeof(linha), arquivo_professor);
 
     printf("\nDados atuais do professor:\n");
     imprimir_professor(&professor_atual);
@@ -276,22 +276,22 @@ case 3:
     Professor *professor_atualizado = construir_professor();
 
     // Posicionar o ponteiro do arquivo na posição do professor
-    fseek(arquivo, posicao_professor, SEEK_SET);
+    fseek(arquivo_professor, posicao_professor, SEEK_SET);
 
     // Atualizar os dados do professor no arquivo
-    fprintf(arquivo, "Matricula: %s", professor_atualizado->matricula);
-    fprintf(arquivo, "CPF: %s", professor_atualizado->cpf);
-    fprintf(arquivo, "Nome: %s", professor_atualizado->nome);
-    fprintf(arquivo, "Endereço: ");
+    fprintf(arquivo_professor, "Matricula: %s", professor_atualizado->matricula);
+    fprintf(arquivo_professor, "CPF: %s", professor_atualizado->cpf);
+    fprintf(arquivo_professor, "Nome: %s", professor_atualizado->nome);
+    fprintf(arquivo_professor, "Endereço: ");
     imprimir_endereco(professor_atualizado->endereco);
 
     // Escrever os dados do endereço do professor, se necessário
-    fprintf(arquivo, "\n");
+    fprintf(arquivo_professor, "\n");
 
     printf("\nDados do professor atualizados:\n");
     imprimir_professor(professor_atualizado);
 
-    fclose(arquivo);
+    fclose(arquivo_professor);
     break;
 }
 
@@ -381,19 +381,19 @@ Aluno *buscar_aluno(Aluno **alunos, int *posicao)
 
 void imprimir_aluno(Aluno *aluno)
 {
-    FILE *arquivo = fopen("dados_alunos.txt", "r");
-    if (arquivo == NULL)
+    FILE *arquivo_aluno = fopen("dados_alunos.txt", "r");
+    if (arquivo_aluno == NULL)
     {
         perror("Erro ao abrir o arquivo para leitura");
         return;
     }
 
     char linha[100];
-    while (fgets(linha, sizeof(linha), arquivo) != NULL)
+    while (fgets(linha, sizeof(linha), arquivo_aluno) != NULL)
     {
         if (strstr(linha, aluno->cpf) != NULL)
         {
-            while (fgets(linha, sizeof(linha), arquivo) != NULL)
+            while (fgets(linha, sizeof(linha), arquivo_aluno) != NULL)
             {
                 if (strstr(linha, ";") != NULL)
                     break;
@@ -403,7 +403,7 @@ void imprimir_aluno(Aluno *aluno)
         }
     }
 
-    fclose(arquivo);
+    fclose(arquivo_aluno);
 }
 
 Professor *construir_professor()
@@ -442,8 +442,27 @@ Professor *buscar_professor(Professor **professores, int *posicao)
 
 void imprimir_professor(Professor *professor)
 {
-    printf("\nMatricula: %s", professor->matricula);
-    printf("Nome: %s", professor->nome);
-    printf("CPF: %s", professor->cpf);
-    imprimir_endereco(professor->endereco);
+    FILE *arquivo_professor = fopen("dados_professores.txt", "r");
+    if (arquivo_professor == NULL)
+    {
+        perror("Erro ao abrir o arquivo para leitura");
+        return;
+    }
+
+    char linha[100];
+    while (fgets(linha, sizeof(linha), arquivo_professor) != NULL)
+    {
+        if (strstr(linha, professor->cpf) != NULL)
+        {
+            while (fgets(linha, sizeof(linha), arquivo_professor) != NULL)
+            {
+                if (strstr(linha, ";") != NULL)
+                    break;
+                printf("%s", linha);
+            }
+            break;
+        }
+    }
+
+    fclose(arquivo_professor);
 }

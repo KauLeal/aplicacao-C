@@ -22,8 +22,8 @@ Aluno *criarAluno(char *matricula, char *cpf, char *nome, Endereco *end)
 
 void salvarDadosAlunos(Aluno **alunos, int qtd_atual_aluno)
 {
-    FILE *arquivo = fopen("dados_alunos.txt", "a");
-    if (arquivo == NULL)
+    FILE *arquivo_aluno = fopen("dados_alunos.txt", "a");
+    if (arquivo_aluno == NULL)
     {
         perror("Erro ao abrir o arquivo para escrita");
         return;
@@ -32,24 +32,24 @@ void salvarDadosAlunos(Aluno **alunos, int qtd_atual_aluno)
     for (int i = 0; i < qtd_atual_aluno; i++)
     {
         Aluno *aluno = alunos[i];
-        fprintf(arquivo, "Matricula: %s", aluno->matricula);
-        fprintf(arquivo, "CPF: %s", aluno->cpf);
-        fprintf(arquivo, "Nome: %s", aluno->nome);
-        fprintf(arquivo, "Logradouro: %s", aluno->endereco->logradouro);
-        fprintf(arquivo, "Bairro: %s", aluno->endereco->bairro);
-        fprintf(arquivo, "Cidade: %s", aluno->endereco->cidade);
-        fprintf(arquivo, "Estado: %s", aluno->endereco->estado);
-        fprintf(arquivo, "Numero: %s", aluno->endereco->numero);
-        fprintf(arquivo, ";\n");
+        fprintf(arquivo_aluno, "Matricula: %s", aluno->matricula);
+        fprintf(arquivo_aluno, "CPF: %s", aluno->cpf);
+        fprintf(arquivo_aluno, "Nome: %s", aluno->nome);
+        fprintf(arquivo_aluno, "Logradouro: %s", aluno->endereco->logradouro);
+        fprintf(arquivo_aluno, "Bairro: %s", aluno->endereco->bairro);
+        fprintf(arquivo_aluno, "Cidade: %s", aluno->endereco->cidade);
+        fprintf(arquivo_aluno, "Estado: %s", aluno->endereco->estado);
+        fprintf(arquivo_aluno, "Numero: %s", aluno->endereco->numero);
+        fprintf(arquivo_aluno, ";\n");
     }
 
-    fclose(arquivo);
+    fclose(arquivo_aluno);
 }
 
 void salvarDadosProfessores(Professor **professores, int qtd_atual_professor)
 {
-    FILE *arquivo = fopen("dados_professores.txt", "a");
-    if (arquivo == NULL)
+    FILE *arquivo_professor = fopen("dados_professores.txt", "a");
+    if (arquivo_professor == NULL)
     {
         perror("Erro ao abrir o arquivo para escrita");
         return;
@@ -58,18 +58,18 @@ void salvarDadosProfessores(Professor **professores, int qtd_atual_professor)
     for (int i = 0; i < qtd_atual_professor; i++)
     {
         Professor *professor = professores[i];
-        fprintf(arquivo, "Matricula: %s", professor->matricula);
-        fprintf(arquivo, "CPF: %s", professor->cpf);
-        fprintf(arquivo, "Nome: %s", professor->nome);
-        fprintf(arquivo, "Logradouro: %s", professor->endereco->logradouro);
-        fprintf(arquivo, "Bairro: %s", professor->endereco->bairro);
-        fprintf(arquivo, "Cidade: %s", professor->endereco->cidade);
-        fprintf(arquivo, "Estado: %s", professor->endereco->estado);
-        fprintf(arquivo, "Numero: %s", professor->endereco->numero);
-        fprintf(arquivo, ";\n");
+        fprintf(arquivo_professor, "Matricula: %s", professor->matricula);
+        fprintf(arquivo_professor, "CPF: %s", professor->cpf);
+        fprintf(arquivo_professor, "Nome: %s", professor->nome);
+        fprintf(arquivo_professor, "Logradouro: %s", professor->endereco->logradouro);
+        fprintf(arquivo_professor, "Bairro: %s", professor->endereco->bairro);
+        fprintf(arquivo_professor, "Cidade: %s", professor->endereco->cidade);
+        fprintf(arquivo_professor, "Estado: %s", professor->endereco->estado);
+        fprintf(arquivo_professor, "Numero: %s", professor->endereco->numero);
+        fprintf(arquivo_professor, ";\n");
     }
 
-    fclose(arquivo);
+    fclose(arquivo_professor);
 }
 
 Endereco *criarEndereco(char *logradouro,

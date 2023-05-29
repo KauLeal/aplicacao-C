@@ -7,3 +7,12 @@ Cidade: Tatooine
 Estado: SW
 Numero: 001
 ;
+Matricula: 999
+CPF: 999
+Nome: Wladia
+Logradouro: Rua do Volei
+Bairro: Volei de Praia
+Cidade: Beach Volley City
+Estado: Haikyuu
+Numero: 99
+;

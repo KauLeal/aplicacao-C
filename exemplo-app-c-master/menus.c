@@ -6,6 +6,7 @@ int menu_principal()
     int opcao = 0;
     do
     {
+        // Exibe o menu principal com as opções disponíveis
         printf("\n== Menu principal ==\n");
         printf("1 - Menu aluno\n");
         printf("2 - Menu professor\n");
@@ -16,18 +17,20 @@ int menu_principal()
         getchar();
         if (opcao > 0 && opcao < 5)
         {
-            return opcao;
+            return opcao; // Retorna a opção escolhida pelo usuário
         }
-        printf("Opcao invalida! Tente novamente\n\n");
+        printf("Opcao invalida! Tente novamente\n\n"); // Mensagem de erro para opção inválida
 
-    } while (1);
+    } while (1); // Loop infinito para repetir o menu até uma opção válida ser escolhida
 }
+
 
 int menu_crud_aluno()
 {
     int opcao = 0;
     do
     {
+        // Exibe o menu de aluno com as opções disponíveis
         printf("\n== Menu aluno==\n");
         printf("1 - Criar aluno\n");
         printf("2 - Ler aluno\n");
@@ -39,11 +42,11 @@ int menu_crud_aluno()
         getchar();
         if (opcao > 0 && opcao < 6)
         {
-            return opcao;
+            return opcao; // Retorna a opção escolhida pelo usuário
         }
-        printf("Opcao invalida! Tente novamente\n\n");
+        printf("Opcao invalida! Tente novamente\n\n"); // Mensagem de erro para opção inválida
 
-    } while (1);
+    } while (1); // Loop infinito para repetir o menu até uma opção válida ser escolhida
 }
 
 int menu_crud_professor()
@@ -51,6 +54,7 @@ int menu_crud_professor()
     int opcao = 0;
     do
     {
+        // Exibe o menu de professor com as opções disponíveis
         printf("\n== Menu professor==\n");
         printf("1 - Criar professor\n");
         printf("2 - Ler professor\n");
@@ -62,11 +66,11 @@ int menu_crud_professor()
         getchar();
         if (opcao > 0 && opcao < 6)
         {
-            return opcao;
+            return opcao;  // Retorna a opção escolhida pelo usuário
         }
-        printf("Opcao invalida! Tente novamente\n\n");
+        printf("Opcao invalida! Tente novamente\n\n");  // Mensagem de erro para opção inválida
 
-    } while (1);
+    } while (1); // Loop infinito para repetir o menu até uma opção válida ser escolhida
 }
 
 int menu_crud_turma()
@@ -74,6 +78,7 @@ int menu_crud_turma()
     int opcao = 0;
     do
     {
+        // Exibe o menu de turma com as opções disponíveis
         printf("\n== Menu turma==\n");
         printf("1 - Criar turma\n");
         printf("2 - Ler turma\n");
@@ -85,9 +90,9 @@ int menu_crud_turma()
         getchar();
         if (opcao > 0 && opcao < 6)
         {
-            return opcao;
+            return opcao;  // Retorna a opção escolhida pelo usuário
         }
-        printf("Opcao invalida! Tente novamente\n\n");
+        printf("Opcao invalida! Tente novamente\n\n");  // Mensagem de erro para opção inválida
 
-    } while (1);
+    } while (1); // Loop infinito para repetir o menu até uma opção válida ser escolhida
 }

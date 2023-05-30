@@ -4,157 +4,173 @@
 #include "constantes.h"
 #include <string.h>
 
+
 void tratador_menu_aluno(Aluno **alunos, int *qtd_atual_aluno)
 {
+    // Obtem a opção escolhida no menu do aluno
     int opcao = menu_crud_aluno();
     Aluno *aluno = NULL;
+
     switch (opcao)
     {
     case 1:
+        // Caso a opção seja 1, confere se o limite de alunos foi atingido
         if (*qtd_atual_aluno >= MAX_ALUNO)
         {
             printf("Numero maximo de alunos atingido\n");
         }
         else
         {
-            // Passo 1: buscar posicao disponível
+            // Busca uma posião disponível
             int i = 0;
             for (; i < *qtd_atual_aluno; i++)
             {
                 if (alunos[i] != NULL)
                 {
-                    // significa que esta posição está livre para uso
+                    // A posição está livre para uso
                     break;
                 }
             }
+            
+            // Construir um novo aluno
             Aluno *aluno = construir_aluno();
+            
+            // Adicionar o aluno na posição encontrada
             alunos[i] = aluno;
+            
+            // Incrementar a quantidade atual de alunos
             (*qtd_atual_aluno)++;
+            
+            // Salvar os dados dos alunos em um arquivo
             salvarDadosAlunos(alunos, *qtd_atual_aluno);
         }
         break;
     case 2:
-{
-    char cpf_pesquisa[9];
-    printf("\nDigite o CPF do aluno: ");
-    fgets(cpf_pesquisa, 9, stdin);
-    printf("\n");
-    cpf_pesquisa[strcspn(cpf_pesquisa, "\n")] = '\0';  // Remover o caractere de nova linha
-
-    FILE *arquivo_aluno = fopen("dados_alunos.txt", "r");
-    if (arquivo_aluno == NULL)
-    {
-        perror("Erro ao abrir o arquivo para leitura");
-        break;
-    }
-
-    char linha[100];
-    while (fgets(linha, sizeof(linha), arquivo_aluno) != NULL)
-    {
-        if (strstr(linha, cpf_pesquisa) != NULL)
+        // Pesquisar aluno por CPF
         {
-            // CPF encontrado, imprimir o aluno
-            Aluno aluno_encontrado;
-            strcpy(aluno_encontrado.cpf, cpf_pesquisa);
-            fgets(aluno_encontrado.nome, sizeof(aluno_encontrado.nome), arquivo_aluno);
-
-            imprimir_aluno(&aluno_encontrado);
-
+            char cpf_pesquisa[9];
+            printf("\nDigite o CPF do aluno: ");
+            fgets(cpf_pesquisa, 9, stdin);
+            printf("\n");
+            cpf_pesquisa[strcspn(cpf_pesquisa, "\n")] = '\0';  // Remover o caractere de nova linha
+            
+            // Abrir o arquivo de dados dos alunos wm modo de leitura
+            FILE *arquivo_aluno = fopen("dados_alunos.txt", "r");
+            if (arquivo_aluno == NULL)
+            {
+                perror("Erro ao abrir o arquivo para leitura");
+                break;
+            }
+            
+            char linha[100];
+            while (fgets(linha, sizeof(linha), arquivo_aluno) != NULL)
+            {
+                if (strstr(linha, cpf_pesquisa) != NULL)
+                {
+                    // CPF encontrado, imprimir o aluno
+                    Aluno aluno_encontrado;
+                    strcpy(aluno_encontrado.cpf, cpf_pesquisa);
+                    fgets(aluno_encontrado.nome, sizeof(aluno_encontrado.nome), arquivo_aluno);
+                    
+                    // Imprimir os dados do aluno encontrado
+                    imprimir_aluno(&aluno_encontrado);
+                    
+                    break;
+                }
+            }
+            
+            fclose(arquivo_aluno);
             break;
         }
-    }
-
-    fclose(arquivo_aluno);
-    break;
-}
-case 3:
-{
-    char cpf_pesquisa[9];
-    printf("Digite o CPF do aluno que deseja atualizar: ");
-    fgets(cpf_pesquisa, 9, stdin);
-    cpf_pesquisa[strcspn(cpf_pesquisa, "\n")] = '\0';  // Remover o caractere de nova linha
-
-    FILE *arquivo_aluno = fopen("dados_alunos.txt", "r+");
-    if (arquivo_aluno == NULL)
-    {
-        perror("Erro ao abrir o arquivo para leitura/escrita");
-        break;
-    }
-
-    char linha[100];
-    long int posicao_aluno = -1;
-    while (fgets(linha, sizeof(linha), arquivo_aluno) != NULL)
-    {
-        if (strstr(linha, cpf_pesquisa) != NULL)
+    case 3:
+        // Atualizar dados do aluno por CPF
         {
-            // CPF encontrado, obter a posição no arquivo
-            posicao_aluno = ftell(arquivo_aluno) - strlen(linha);
+            char cpf_pesquisa[9];
+            printf("Digite o CPF do aluno que deseja atualizar: ");
+            fgets(cpf_pesquisa, 9, stdin);
+            cpf_pesquisa[strcspn(cpf_pesquisa, "\n")] = '\0';  // Remover o caractere de nova linha
+            
+            // Abrir o arquivo de dados dos alunos para leitura/escrita
+            FILE *arquivo_aluno = fopen("dados_alunos.txt", "r+");
+            if (arquivo_aluno == NULL)
+            {
+                perror("Erro ao abrir o arquivo para leitura/escrita");
+                break;
+            }
+            
+            char linha[100];
+            long int posicao_aluno = -1;
+            while (fgets(linha, sizeof(linha), arquivo_aluno) != NULL)
+            {
+                if (strstr(linha, cpf_pesquisa) != NULL)
+                {
+                    // CPF encontrado, obter a posição no arquivo
+                    posicao_aluno = ftell(arquivo_aluno) - strlen(linha);
+                    break;
+                }
+            }
+            
+            if (posicao_aluno == -1)
+            {
+                printf("Aluno nao encontrado\n");
+                fclose(arquivo_aluno);
+                break;
+            }
+            
+            // Posicionar o ponteiro do arquivo na posição do aluno
+            fseek(arquivo_aluno, posicao_aluno, SEEK_SET);
+            
+            // Ler os dados atuais do aluno
+            Aluno aluno_atual;
+            fgets(aluno_atual.matricula, sizeof(aluno_atual.matricula), arquivo_aluno);
+            fgets(aluno_atual.cpf, sizeof(aluno_atual.cpf), arquivo_aluno);
+            fgets(aluno_atual.nome, sizeof(aluno_atual.nome), arquivo_aluno);
+            
+            // Pular a linha em branco
+            fgets(linha, sizeof(linha), arquivo_aluno);
+            
+            printf("\nDados atuais do aluno:\n");
+            imprimir_aluno(&aluno_atual);
+            
+            printf("\nDigite os novos dados do aluno:\n");
+            Aluno *aluno_atualizado = construir_aluno();
+            
+            // Posicionar o ponteiro do arquivo na posição do aluno
+            fseek(arquivo_aluno, posicao_aluno, SEEK_SET);
+            
+            // Atualizar os dados do aluno no arquivo
+            fprintf(arquivo_aluno, "Matricula: %s", aluno_atualizado->matricula);
+            fprintf(arquivo_aluno, "CPF: %s", aluno_atualizado->cpf);
+            fprintf(arquivo_aluno, "Nome: %s", aluno_atualizado->nome);
+            fprintf(arquivo_aluno, "Endereço: ");
+            imprimir_endereco(aluno_atualizado->endereco);
+            
+            // Escrever os dados do endereço do aluno, se necessário
+            fprintf(arquivo_aluno, "\n");
+            
+            printf("\nDados do aluno atualizados:\n");
+            imprimir_aluno(aluno_atualizado);
+            
+            fclose(arquivo_aluno);
             break;
         }
-    }
-
-    if (posicao_aluno == -1)
-    {
-        printf("Aluno nao encontrado\n");
-        fclose(arquivo_aluno);
-        break;
-    }
-
-    // Posicionar o ponteiro do arquivo na posição do aluno
-    fseek(arquivo_aluno, posicao_aluno, SEEK_SET);
-
-    // Ler os dados atuais do aluno
-    Aluno aluno_atual;
-    fgets(aluno_atual.matricula, sizeof(aluno_atual.matricula), arquivo_aluno);
-    fgets(aluno_atual.cpf, sizeof(aluno_atual.cpf), arquivo_aluno);
-    fgets(aluno_atual.nome, sizeof(aluno_atual.nome), arquivo_aluno);
-
-    // Pular a linha em branco
-    fgets(linha, sizeof(linha), arquivo_aluno);
-
-    printf("\nDados atuais do aluno:\n");
-    imprimir_aluno(&aluno_atual);
-
-    printf("\nDigite os novos dados do aluno:\n");
-    Aluno *aluno_atualizado = construir_aluno();
-
-    // Posicionar o ponteiro do arquivo na posição do aluno
-    fseek(arquivo_aluno, posicao_aluno, SEEK_SET);
-
-    // Atualizar os dados do aluno no arquivo
-    fprintf(arquivo_aluno, "Matricula: %s", aluno_atualizado->matricula);
-    fprintf(arquivo_aluno, "CPF: %s", aluno_atualizado->cpf);
-    fprintf(arquivo_aluno, "Nome: %s", aluno_atualizado->nome);
-    fprintf(arquivo_aluno, "Endereço: ");
-    imprimir_endereco(aluno_atualizado->endereco);
-
-    // Escrever os dados do endereço do aluno, se necessário
-    fprintf(arquivo_aluno, "\n");
-
-    printf("\nDados do aluno atualizados:\n");
-    imprimir_aluno(aluno_atualizado);
-
-    fclose(arquivo_aluno);
-    break;
-}
-
     case 4:
-    {
-        int posicao = 0;
-        aluno = buscar_aluno(alunos, &posicao);
-        if (aluno)
+        // Remover aluno por CPF
         {
-            destruirAluno(aluno);
-            alunos[posicao] = NULL;
-            printf("Aluno destruido\n");
+            int posicao = 0;
+            aluno = buscar_aluno(alunos, &posicao);
+            if (aluno)
+            {
+                destruirAluno(aluno);
+                alunos[posicao] = NULL;
+                printf("Aluno destruido\n");
+            }
+            else
+            {
+                printf("Aluno nao encontrado!!\n");
+            }
         }
-        else
-        {
-            printf("Aluno nao encontrado!!\n");
-        }
-    }
-
-    break;
+        break;
     default:
         printf("Retornando ao menu principal\n");
         break;
@@ -163,6 +179,7 @@ case 3:
 
 void tratador_menu_professor(Professor **professores, int *qtd_atual_professor)
 {
+    // A estrutura é a mesma de alunos
     int opcao = menu_crud_professor();
     Professor *professor = NULL;
     switch (opcao)
@@ -174,13 +191,11 @@ void tratador_menu_professor(Professor **professores, int *qtd_atual_professor)
         }
         else
         {
-            // Passo 1: buscar posicao disponível
             int i = 0;
             for (; i < *qtd_atual_professor; i++)
             {
                 if (professores[i] != NULL)
                 {
-                    // significa que esta posição está livre para uso
                     break;
                 }
             }
@@ -229,7 +244,7 @@ case 3:
     char cpf_pesquisa[9];
     printf("Digite o CPF do professor que deseja atualizar: ");
     fgets(cpf_pesquisa, 9, stdin);
-    cpf_pesquisa[strcspn(cpf_pesquisa, "\n")] = '\0';  // Remover o caractere de nova linha
+    cpf_pesquisa[strcspn(cpf_pesquisa, "\n")] = '\0';
 
     FILE *arquivo_professor = fopen("dados_professores.txt", "r+");
     if (arquivo_professor == NULL)
@@ -244,7 +259,6 @@ case 3:
     {
         if (strstr(linha, cpf_pesquisa) != NULL)
         {
-            // CPF encontrado, obter a posição no arquivo
             posicao_professor = ftell(arquivo_professor) - strlen(linha);
             break;
         }
@@ -257,16 +271,13 @@ case 3:
         break;
     }
 
-    // Posicionar o ponteiro do arquivo na posição do professor
     fseek(arquivo_professor, posicao_professor, SEEK_SET);
 
-    // Ler os dados atuais do professor
     Professor professor_atual;
     fgets(professor_atual.matricula, sizeof(professor_atual.matricula), arquivo_professor);
     fgets(professor_atual.cpf, sizeof(professor_atual.cpf), arquivo_professor);
     fgets(professor_atual.nome, sizeof(professor_atual.nome), arquivo_professor);
 
-    // Pular a linha em branco
     fgets(linha, sizeof(linha), arquivo_professor);
 
     printf("\nDados atuais do professor:\n");
@@ -275,17 +286,14 @@ case 3:
     printf("\nDigite os novos dados do professor:\n");
     Professor *professor_atualizado = construir_professor();
 
-    // Posicionar o ponteiro do arquivo na posição do professor
     fseek(arquivo_professor, posicao_professor, SEEK_SET);
 
-    // Atualizar os dados do professor no arquivo
     fprintf(arquivo_professor, "Matricula: %s", professor_atualizado->matricula);
     fprintf(arquivo_professor, "CPF: %s", professor_atualizado->cpf);
     fprintf(arquivo_professor, "Nome: %s", professor_atualizado->nome);
     fprintf(arquivo_professor, "Endereço: ");
     imprimir_endereco(professor_atualizado->endereco);
 
-    // Escrever os dados do endereço do professor, se necessário
     fprintf(arquivo_professor, "\n");
 
     printf("\nDados do professor atualizados:\n");
@@ -322,6 +330,7 @@ Endereco *construir_endereco()
 {
     Endereco endereco;
 
+    // Solicita e lê os dados
     printf("Logradouro\t> ");
     fgets(endereco.logradouro, 49, stdin);
     printf("Bairro\t> ");
@@ -333,11 +342,13 @@ Endereco *construir_endereco()
     printf("Numero\t> ");
     fgets(endereco.numero, 9, stdin);
 
+    // Cria e retorna um novo objeto Endereco
     return criarEndereco(endereco.logradouro, endereco.bairro, endereco.cidade, endereco.estado, endereco.numero);
 }
 
 void imprimir_endereco(Endereco *endereco)
 {
+    // Imprimi as informações do endereço
     printf("Logradouro: %s", endereco->logradouro);
     printf("Bairro: %s", endereco->bairro);
     printf("Cidade: %s", endereco->cidade);
@@ -348,6 +359,8 @@ void imprimir_endereco(Endereco *endereco)
 Aluno *construir_aluno()
 {
     Aluno aluno;
+
+    // Solicita e lê os dados
     printf("\nMatricula\t> ");
     fgets(aluno.matricula, 9, stdin);
     printf("CPF\t> ");
@@ -361,26 +374,35 @@ Aluno *construir_aluno()
 Aluno *buscar_aluno(Aluno **alunos, int *posicao)
 {
     char matricula[50];
+
+    // Solicitar e ler a matrícula do aluno a ser buscado
     printf("\nMatricula > ");
     fgets(matricula, 49, stdin);
+
     Aluno *resultado = NULL;
     int pos_resultado = -1;
+
+    // Iterar sobre os alunos para encontrar o aluno com a matrícula correspondente
     for (int i = 0; i < MAX_ALUNO; i++)
     {
-        // Vamos testar se o aluno existe e se a matricula e a buscada
-        // strcmp compara strings. Se for 0 indica que são iguais
         if (alunos[i] && !strcmp(matricula, alunos[i]->matricula))
         {
             resultado = alunos[i];
+            pos_resultado = i;
             break;
         }
     }
+
+    // Armazenar a posição do aluno encontrado
     *posicao = pos_resultado;
+
+    // Retornar o aluno encontrado (ou NULL se não encontrado)
     return resultado;
 }
 
 void imprimir_aluno(Aluno *aluno)
 {
+    // Abrir o arquivo de dados dos alunos para leitura
     FILE *arquivo_aluno = fopen("dados_alunos.txt", "r");
     if (arquivo_aluno == NULL)
     {
@@ -389,10 +411,13 @@ void imprimir_aluno(Aluno *aluno)
     }
 
     char linha[100];
+
+    // Procurar o CPF do aluno no arquivo de dados
     while (fgets(linha, sizeof(linha), arquivo_aluno) != NULL)
     {
         if (strstr(linha, aluno->cpf) != NULL)
         {
+            // Imprimir as linhas correspondentes aos dados do aluno
             while (fgets(linha, sizeof(linha), arquivo_aluno) != NULL)
             {
                 if (strstr(linha, ";") != NULL)
@@ -403,6 +428,7 @@ void imprimir_aluno(Aluno *aluno)
         }
     }
 
+    // Fechar o arquivo de dados dos alunos
     fclose(arquivo_aluno);
 }
 
@@ -428,8 +454,6 @@ Professor *buscar_professor(Professor **professores, int *posicao)
     int pos_resultado = -1;
     for (int i = 0; i < MAX_PROFESSOR; i++)
     {
-        // Vamos testar se o professor existe e se a matricula e a buscada
-        // strcmp compara strings. Se for 0 indica que são iguais
         if (professores[i] && !strcmp(matricula, professores[i]->matricula))
         {
             resultado = professores[i];
@@ -469,6 +493,7 @@ void imprimir_professor(Professor *professor)
 
 void tratador_menu_turma(Turma **turmas, int *qtd_atual_turma)
 {
+    // A estrutura é a mesma de alunos e de professores
     int opcao = menu_crud_turma();
     Turma *turma = NULL;
     switch (opcao)
@@ -480,13 +505,11 @@ void tratador_menu_turma(Turma **turmas, int *qtd_atual_turma)
         }
         else
         {
-            // Passo 1: buscar posicao disponível
             int i = 0;
             for (; i < *qtd_atual_turma; i++)
             {
                 if (turmas[i] != NULL)
                 {
-                    // significa que esta posição está livre para uso
                     break;
                 }
             }
@@ -502,7 +525,7 @@ void tratador_menu_turma(Turma **turmas, int *qtd_atual_turma)
     printf("\nDigite o codigo do turma: ");
     fgets(cod_pesquisa, 9, stdin);
     printf("\n");
-    cod_pesquisa[strcspn(cod_pesquisa, "\n")] = '\0';  // Remover o caractere de nova linha
+    cod_pesquisa[strcspn(cod_pesquisa, "\n")] = '\0';
 
     FILE *arquivo_turma = fopen("dados_turmas.txt", "r");
     if (arquivo_turma == NULL)
@@ -516,7 +539,6 @@ void tratador_menu_turma(Turma **turmas, int *qtd_atual_turma)
     {
         if (strstr(linha, cod_pesquisa) != NULL)
         {
-            // Codigo encontrado, imprimir a turma
             Turma turma_encontrado;
             strcpy(turma_encontrado.codigo, cod_pesquisa);
             fgets(turma_encontrado.nome_disc, sizeof(turma_encontrado.nome_disc), arquivo_turma);
@@ -535,7 +557,7 @@ case 3:
     char cod_pesquisa[9];
     printf("Digite o codigo da turma que deseja atualizar: ");
     fgets(cod_pesquisa, 9, stdin);
-    cod_pesquisa[strcspn(cod_pesquisa, "\n")] = '\0';  // Remover o caractere de nova linha
+    cod_pesquisa[strcspn(cod_pesquisa, "\n")] = '\0';
 
     FILE *arquivo_turma = fopen("dados_turmas.txt", "r+");
     if (arquivo_turma == NULL)
@@ -550,7 +572,6 @@ case 3:
     {
         if (strstr(linha, cod_pesquisa) != NULL)
         {
-            // Codigo encontrado, obter a posição no arquivo
             posicao_turma = ftell(arquivo_turma) - strlen(linha);
             break;
         }
@@ -563,17 +584,14 @@ case 3:
         break;
     }
 
-    // Posicionar o ponteiro do arquivo na posição da turma
     fseek(arquivo_turma, posicao_turma, SEEK_SET);
 
-    // Ler os dados atuais da turma
     Turma turma_atual;
     fgets(turma_atual.codigo, sizeof(turma_atual.codigo), arquivo_turma);
     fgets(turma_atual.nome_disc, sizeof(turma_atual.nome_disc), arquivo_turma);
     fgets(turma_atual.prof, sizeof(turma_atual.prof), arquivo_turma);
     fgets(turma_atual.media, sizeof(turma_atual.media), arquivo_turma);
 
-    // Pular a linha em branco
     fgets(linha, sizeof(linha), arquivo_turma);
 
     printf("\nDados atuais da turma:\n");
@@ -582,16 +600,13 @@ case 3:
     printf("\nDigite os novos dados da turma:\n");
     Turma *turma_atualizado = construir_turma();
 
-    // Posicionar o ponteiro do arquivo na posição da turma
     fseek(arquivo_turma, posicao_turma, SEEK_SET);
 
-    // Atualizar os dados da turma no arquivo
     fprintf(arquivo_turma, "Codigo da turma: %s", turma_atualizado->codigo);
     fprintf(arquivo_turma, "Nome da disciplina: %s", turma_atualizado->nome_disc);
     fprintf(arquivo_turma, "Professor da turma: %s", turma_atualizado->prof);
     fprintf(arquivo_turma, "Nota media da turma: %s", turma_atualizado->media);
 
-    // Escrever os dados do endereço da turma, se necessário
     fprintf(arquivo_turma, "\n");
 
     printf("\nDados da turma atualizados:\n");
@@ -647,8 +662,6 @@ Turma *buscar_turma(Turma **turmas, int *posicao)
     int pos_resultado = -1;
     for (int i = 0; i < MAX_TURMA; i++)
     {
-        // Vamos testar se a turma existe e se o codigo e a buscada
-        // strcmp compara strings. Se for 0 indica que são iguais
         if (turmas[i] && !strcmp(codigo, turmas[i]->codigo))
         {
             resultado = turmas[i];
